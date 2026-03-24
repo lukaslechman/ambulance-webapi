@@ -1,3 +1,5 @@
 *.exe
 *.exe~
-./ambulance-api-service
+.ambulance-api-service
+
+.env
