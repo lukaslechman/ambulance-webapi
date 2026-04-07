@@ -50,6 +50,11 @@ func (a *Ambulance) reconcileWaitingList() {
 			entry.EstimatedStart = entry.WaitingSince
 		}
 
+		// default duration if missing
+		if entry.EstimatedDurationMinutes <= 0 {
+			entry.EstimatedDurationMinutes = 5
+		}
+
 		nextEntryStart = entry.EstimatedStart.Add(time.Duration(entry.EstimatedDurationMinutes) * time.Minute)
 	}
 }
