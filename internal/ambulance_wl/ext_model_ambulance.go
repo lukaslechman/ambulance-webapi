@@ -10,6 +10,7 @@ func (a *Ambulance) reconcileWaitingList() {
 	if len(a.WaitingList) == 0 {
 		return
 	}
+
 	slices.SortFunc(a.WaitingList, func(left, right WaitingListEntry) int {
 		if left.WaitingSince.Before(right.WaitingSince) {
 			return -1
@@ -35,16 +36,20 @@ func (a *Ambulance) reconcileWaitingList() {
 	nextEntryStart :=
 		a.WaitingList[0].EstimatedStart.
 			Add(time.Duration(a.WaitingList[0].EstimatedDurationMinutes) * time.Minute)
+
 	for _, entry := range a.WaitingList[1:] {
-		if entry.EstimatedStart.Before(nextEntryStart) {
+		if entry.WaitingSince.IsZero() {
+			entry.WaitingSince = time.Now()
+		}
+
+		if entry.EstimatedStart.IsZero() || entry.EstimatedStart.Before(nextEntryStart) {
 			entry.EstimatedStart = nextEntryStart
 		}
+
 		if entry.EstimatedStart.Before(entry.WaitingSince) {
 			entry.EstimatedStart = entry.WaitingSince
 		}
 
-		nextEntryStart =
-			entry.EstimatedStart.
-				Add(time.Duration(entry.EstimatedDurationMinutes) * time.Minute)
+		nextEntryStart = entry.EstimatedStart.Add(time.Duration(entry.EstimatedDurationMinutes) * time.Minute)
 	}
 }
