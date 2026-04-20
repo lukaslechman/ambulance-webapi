@@ -89,7 +89,17 @@ func (o implAmbulanceWaitingListAPI) DeleteWaitingListEntry(c *gin.Context) {
 			}, http.StatusNotFound
 		}
 
-		ambulance.WaitingList = append(ambulance.WaitingList[:entryIndx], ambulance.WaitingList[entryIndx+1:]...)
+		//ambulance.WaitingList = append(ambulance.WaitingList[:entryIndx], ambulance.WaitingList[entryIndx+1:]...)
+
+		ambulance.WaitingList = append(
+			ambulance.WaitingList[:entryIndx],
+			ambulance.WaitingList[entryIndx+1:]...,
+		)
+
+		if ambulance.WaitingList == nil {
+			ambulance.WaitingList = make([]WaitingListEntry, 0)
+		}
+
 		ambulance.reconcileWaitingList()
 		return ambulance, nil, http.StatusNoContent
 	})
